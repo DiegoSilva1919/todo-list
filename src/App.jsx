@@ -1,33 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState } from 'react'
+import { v4 as uuid } from 'uuid'
+import { Div1, Div2, Input, Button, Div3, Trash, Check } from './styles.js'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [List, setList] = useState([])
+  const [inputTask, setInputTask] = useState('')
+
+  function inputMudou(e) {
+    setInputTask(e.target.value)
+  }
+
+  function cliqueiNoBotao() {
+    if(inputTask) {
+    setList([...List, { id: uuid(), task: inputTask, finished: false }])
+    }
+  }
+
+  function FinalizarTarefa(id) {
+    const newList=List.map(item => (
+      item.id === id ? { ... item, finished: !item.finished} : item
+    ))
+    setList(newList)
+  }
+
+  function ApagarTarefa(id) {
+    const newList=List.filter((item) => item.id !== id)
+
+    setList(newList)
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <Div1>
+      <Div2>
+        <Input onChange={inputMudou} type="text" placeholder="O que tenho para fazer..." />
+        <Button onClick={cliqueiNoBotao}>Adicionar</Button>
+
+        <ul>
+          {
+            List.length > 0 ? (
+            List.map(item => (
+                <Div3 isFinished={item.finished} key={item.id}>
+                  <Check onClick={() => FinalizarTarefa(item.id)}/>
+                  <li>{item.task}</li>
+                  <Trash onClick={() => ApagarTarefa(item.id)}/>
+                </Div3>
+            ))) : ( <h3>Sem Tarefa na lista</h3> )
+          }
+        </ul>
+      </Div2>
+    </Div1>
   )
 }
 
